@@ -83,6 +83,11 @@ button{
 </style>
 <script type="text/javascript">
 $(document).ready(function(){
+var yhglback =${yhglback};
+if(yhglback=="1"){
+	$("[name='div3']").attr("class","out");
+	$("#yhgl").attr("class","on");
+}
 	$("#li_pwgl").click(function(){
 		debugger
 		$("[name='div3']").attr("class","out");
@@ -130,9 +135,17 @@ $(document).ready(function(){
 		location.href = "delUserShow";
 	})
 	$("#searchUserSign").click(function(){
-		//传输到后台，跳转到删除用户的界面
+		//传输到后台，跳转到查看用户记录的界面
 		location.href = "searchUserSignShow";
 	})
+	$("#addGg").click(function(){
+		//传输到后台，跳转到增加公告的界面
+		location.href = "addAdminGg";
+	}) 
+	/* $("#addGg").click(function(){
+		//传输到后台，跳转到查看公告的界面
+		location.href = "addAdminGg";
+	}) */
 	
 })
 //增加线路的弹窗				
@@ -151,13 +164,17 @@ var addUserResult = "${addUserResult }";
 if(addUserResult=="success"){
 	alert("新增成功");
 }
+var tuipiaoResult = "${tuipiaoResult }";
+if(tuipiaoResult=="success"){
+	alert("删除成功");
+}
 </script>
 </head>
 <body>
 	<div class="head">
 		<span style="font-size:35px;margin-left:10px;"><b>订票王管理页面</b></span>
 		<span style="float:right;font-size:14px;margin-top:30px;"><label>你好，管理员</label>&emsp;
-					<a href="" style="color:orange;text-decoration: none;">退出&emsp;&emsp;</a></span>
+					<a href="login" style="color:orange;text-decoration: none;" onclick="if(confirm('确认退出吗？')==false)return false">退出&emsp;&emsp;</a></span>
 	</div>
 	<div class="body">
 		<div class="daohang">
@@ -195,7 +212,43 @@ if(addUserResult=="success"){
 			</div>
 		</div>
 		<div id="ddgl" class="out" name ="div3">
-			查询出订单list，最后一列的操作有修改和删除
+			<table class="table" style="width:100%;">
+					<thead>
+						<tr>
+				<th>#</th>
+				<th>账号</th>
+					<th>起始地</th>
+					<th>目的地</th>
+					
+					<th>发车时间</th>
+					<th>时长</th>
+					<th>价格(元)</th>
+					<th>操作</th>
+			</tr>
+					</thead>
+					<tbody>
+<%-- 						<%
+							for (;;) {
+						%> --%>
+					<c:forEach items="${xls}" var="xl">
+					<tr>
+						<td>${xl.id}</td>
+						<td>${xl.username}</td>
+						<td>${xl.qsdsj}(${xl.qsdxj})</td>
+						<td>${xl.mddsj}(${xl.mddxj})</td>
+						
+						<td>${xl.fcsj}</td>
+						<td>${xl.sc}</td>
+						<td>${xl.jg}</td>
+						<td><a href="AdminTuipiao?id=${xl.id}&username=${xl.username}"
+						onclick="if(confirm('确认删除吗？')==false)return false">删除</a></td>
+					</tr>
+				</c:forEach>
+<%-- 					<%
+						}
+					%> --%>
+					</tbody>
+				</table>
 		</div>
 		<div id="yhgl" class="out" name="div3"> 
 			<div id="addUser" style="float:left;margin-top:100px;margin-left:380px;cursor:pointer;" >
@@ -224,35 +277,27 @@ if(addUserResult=="success"){
 			</div>
 		</div>
 		<div id="gggl" class="out" name="div3"> 
-			<button style="float:right;margin-top:20px;margin-right:30px;margin-bottom:20px;">增加公告</button>
+			<button id="addGg" style="float:right;margin-top:20px;margin-right:30px;margin-bottom:20px;">增加公告</button>
 				<table class="table" style="width:100%;">
 					<thead>
 						<tr>
-							<th>ID</th>
-							<th>公告名称</th>
+							<th>#</th>
+							<th>公告标题</th>
 							<th>发布时间</th>
-							<th>发布者</th>
 							<th>操作</th>
 						</tr>
 					</thead>
 					<tbody>
-<%-- 						<%
-							for (;;) {
-						%> --%>
+					<c:forEach items="${ggs}" var="gg">
 					<tr>
-						<td>1</td>
-						<td><a href="" style="text-decoration: none;">汽车订票王开始订票啦！</a></td>
-						<td>2020-04-02</td>
-						<td>管理员</td>
-						<td><a src="">删除</a></td>
+						<td>${gg.id}</td>
+						<td>${gg.ggbt}</td>
+						<td>${gg.cjsj}</td>
+						<td><a href="adminDelGongGao?id=${gg.id}"onclick="if(confirm('确认删除吗？')==false)return false">删除</a> | 
+						<a href="adminEditGongGao?id=${gg.id}">编辑</a>
+						</td>
 					</tr>
-					<tr>
-						<td>2</td>
-						<td><a href="" style="text-decoration: none;">11汽车订票王开始订票啦！</a></td>
-						<td>2020-04-02</td>
-						<td>管理员</td>
-						<td><a src="">删除</a></td>
-					</tr>
+					</c:forEach>
 <%-- 					<%
 						}
 					%> --%>

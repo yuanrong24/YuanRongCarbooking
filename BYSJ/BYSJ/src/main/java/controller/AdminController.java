@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import dao.UserDao;
+import entity.GongGao;
 import entity.User;
 import entity.XianLu;
 
@@ -70,8 +71,17 @@ public class AdminController {
 
 	// 增加线路、编辑线路、删除线路的返回按钮
 	@RequestMapping("returnAdminIndex")
-	public String returnAdminIndex() {
-		return "admin/AdminIndex";
+	public ModelAndView returnAdminIndex() {
+		ModelAndView mv = new ModelAndView("admin/AdminIndex");
+		List<GongGao> ggs = new ArrayList<GongGao>();
+		List<XianLu> xls = new ArrayList<XianLu>();
+		xls = usdao.cxOrder();
+		ggs = usdao.cxGongGao();
+		String yhglback = "1";
+		mv.addObject("xls", xls);
+		mv.addObject("ggs", ggs);
+		mv.addObject("yhglback", yhglback);
+		return mv;
 	}
 
 	// 跳转删除线路界面
@@ -250,6 +260,149 @@ public class AdminController {
 		List<User> users = new ArrayList<User>();
 		users = usdao.cxUser();
 		mv.addObject("users", users);
+		return mv;
+	}
+
+	// 跳转查看某个用户每一个订单的页面
+	@RequestMapping("searchUserOrdersSignShow")
+	public ModelAndView searchUserSignShow(String username) {
+		ModelAndView mv = new ModelAndView("admin/searchUserSignShow");
+		List<XianLu> xls = new ArrayList<XianLu>();
+		xls = usdao.cxOrder(username);
+		mv.addObject("xls", xls);
+		return mv;
+	}
+	/*
+	 * // 订单查询界面
+	 * 
+	 * @RequestMapping("adminDingDanShow") public ModelAndView
+	 * tuipiaoShow(HttpServletRequest request) { ModelAndView mv = new
+	 * ModelAndView("admin/AdminIndex"); List<XianLu> xls = new ArrayList<XianLu>();
+	 * xls = usdao.cxOrder(); mv.addObject("xls", xls); return mv; }
+	 */
+
+	// 删除订单的数据库操作
+	@RequestMapping("AdminTuipiao")
+	public ModelAndView tuipiao(String id, String username) {
+		ModelAndView mv = new ModelAndView("admin/AdminIndex");
+		int idXianlu = Integer.parseInt(id);
+		boolean flag = usdao.tuipiao(idXianlu, username);
+		if (flag) {
+			mv.addObject("tuipiaoResult", "success");
+		}
+		List<GongGao> ggs = new ArrayList<GongGao>();
+		List<XianLu> xls = new ArrayList<XianLu>();
+		xls = usdao.cxOrder();
+		ggs = usdao.cxGongGao();
+		mv.addObject("xls", xls);
+		mv.addObject("ggs", ggs);
+		return mv;
+	}
+
+	// 跳转到增加公告的jsp页面
+	@RequestMapping("addAdminGg")
+	public ModelAndView addAdminGg() {
+		ModelAndView mv = new ModelAndView("admin/AddGG");
+		mv.addObject("type", "A");
+		return mv;
+	}
+
+	// 增加公告的数据库操作
+	@RequestMapping("addGonggao")
+	public ModelAndView addGonggao(GongGao gg) {
+		ModelAndView mv = new ModelAndView("admin/AdminIndex");
+		boolean flag = usdao.addGongGao(gg);
+		if (flag) {
+			mv.addObject("addUserResult", "success");
+		}
+		return mv;
+	}
+
+	/*
+	 * // 后台公告查询界面
+	 * 
+	 * @RequestMapping("adminGongGaoShow") public ModelAndView
+	 * adminGongGaoShow(HttpServletRequest request) { ModelAndView mv = new
+	 * ModelAndView("admin/AdminIndex"); List<GongGao> ggs = new
+	 * ArrayList<GongGao>(); ggs = usdao.cxGongGao(); mv.addObject("ggs", ggs);
+	 * return mv; }
+	 */
+	// 删除公告数据库操作
+	@RequestMapping("adminDelGongGao")
+	public ModelAndView adminDelGongGao(String id) {
+		ModelAndView mv = new ModelAndView("admin/AdminIndex");
+		int idGG = Integer.parseInt(id);
+		boolean flag = usdao.delGongGao(idGG);
+		if (flag) {
+			mv.addObject("tuipiaoResult", "success");
+		}
+		List<GongGao> ggs = new ArrayList<GongGao>();
+		List<XianLu> xls = new ArrayList<XianLu>();
+		xls = usdao.cxOrder();
+		ggs = usdao.cxGongGao();
+		mv.addObject("xls", xls);
+		mv.addObject("ggs", ggs);
+		return mv;
+	}
+
+	// 跳转到修改公告的jsp页面
+	@RequestMapping("adminEditGongGao")
+	public ModelAndView adminEditGongGao(String id) {
+		int idGG = Integer.parseInt(id);
+		ModelAndView mv = new ModelAndView("admin/AddGG");
+		GongGao gg = new GongGao();
+		gg = usdao.cxGongGao(idGG);
+		mv.addObject("gg", gg);
+		mv.addObject("type", "C");
+		return mv;
+	}
+
+	// 修改公告的数据库操作
+	@RequestMapping("editGonggao")
+	public ModelAndView editGonggao(GongGao gg) {
+		ModelAndView mv = new ModelAndView("admin/AdminIndex");
+		boolean flag = usdao.editGonggao(gg);
+		if (flag) {
+			mv.addObject("editResult", "success");
+		}
+		List<GongGao> ggs = new ArrayList<GongGao>();
+		List<XianLu> xls = new ArrayList<XianLu>();
+		xls = usdao.cxOrder();
+		ggs = usdao.cxGongGao();
+		mv.addObject("xls", xls);
+		mv.addObject("ggs", ggs);
+		return mv;
+	}
+
+	// 编辑线路的搜索控制，判断用户到底输入了起始地还是目的地，都没有输入就查询所有的线路
+	@RequestMapping("adminEditSearchChePiao")
+	public ModelAndView adminEditSearchChePiao(String qsdxj, String mddxj) {
+		ModelAndView mv = new ModelAndView("admin/editXianLu");
+		List<XianLu> xls = new ArrayList<XianLu>();
+		if (!"".equals(qsdxj)) {
+			xls = usdao.cxSearchChePiaoQsd(qsdxj);
+		} else if (!"".equals(mddxj)) {
+			xls = usdao.cxSearchChePiaoMdd(mddxj);
+		} else {
+			xls = usdao.cxUserXianLu();
+		}
+		mv.addObject("xls", xls);
+		return mv;
+	}
+
+	// 删除线路的搜索控制，判断用户到底输入了起始地还是目的地，都没有输入就查询所有的线路
+	@RequestMapping("adminDelSearchChePiao")
+	public ModelAndView adminDelSearchChePiao(String qsdxj, String mddxj) {
+		ModelAndView mv = new ModelAndView("admin/delXianLu");
+		List<XianLu> xls = new ArrayList<XianLu>();
+		if (!"".equals(qsdxj)) {
+			xls = usdao.cxSearchChePiaoQsd(qsdxj);
+		} else if (!"".equals(mddxj)) {
+			xls = usdao.cxSearchChePiaoMdd(mddxj);
+		} else {
+			xls = usdao.cxUserXianLu();
+		}
+		mv.addObject("xls", xls);
 		return mv;
 	}
 }
